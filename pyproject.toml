@@ -3,12 +3,12 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "stillpoint"
+name = "stillpoint-bar"
 version = "0.1.0"
 description = "A calm, typographically considered progress indicator for the terminal."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Abhishek Shah", email = "abhishek.aimarine@gmail.com" }
 ]
@@ -16,7 +16,6 @@ keywords = ["progress-bar", "cli", "terminal", "ui", "design", "ambient"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: User Interfaces",
@@ -26,7 +25,7 @@ dependencies = []
 
 [project.urls]
 Homepage = "https://abhishekshah.vercel.app"
-Repository = "https://github.com/YOUR_GITHUB_HANDLE/stillpoint"
+Repository = "https://github.com/abhiverse01/stillpoint"
 
 [tool.setuptools.packages.find]
 where = ["src"]
