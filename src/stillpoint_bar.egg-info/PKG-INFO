@@ -1,15 +1,14 @@
 Metadata-Version: 2.4
-Name: stillpoint
+Name: stillpoint-bar
 Version: 0.1.0
 Summary: A calm, typographically considered progress indicator for the terminal.
 Author-email: Abhishek Shah <abhishek.aimarine@gmail.com>
-License: MIT
+License-Expression: MIT
 Project-URL: Homepage, https://abhishekshah.vercel.app
-Project-URL: Repository, https://github.com/YOUR_GITHUB_HANDLE/stillpoint
+Project-URL: Repository, https://github.com/abhiverse01/stillpoint
 Keywords: progress-bar,cli,terminal,ui,design,ambient
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: Developers
-Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python :: 3
 Classifier: Topic :: Software Development :: User Interfaces

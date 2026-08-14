@@ -6,8 +6,8 @@ src/stillpoint/color.py
 src/stillpoint/core.py
 src/stillpoint/render.py
 src/stillpoint/typography.py
-src/stillpoint.egg-info/PKG-INFO
-src/stillpoint.egg-info/SOURCES.txt
-src/stillpoint.egg-info/dependency_links.txt
-src/stillpoint.egg-info/top_level.txt
+src/stillpoint_bar.egg-info/PKG-INFO
+src/stillpoint_bar.egg-info/SOURCES.txt
+src/stillpoint_bar.egg-info/dependency_links.txt
+src/stillpoint_bar.egg-info/top_level.txt
 tests/test_core.py
