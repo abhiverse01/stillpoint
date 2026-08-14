@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>stillpoint — a progress bar with nothing to prove</title>
+<meta name="description" content="A calm, typographically considered progress indicator for the terminal. pip install stillpoint">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12151A;
+    --ink-raised:#191D24;
+    --bone:#EDE8DF;
+    --bone-dim:#A8A79E;
+    --sage:#93A78C;
+    --plum:#A8839B;
+    --sand:#C9B48C;
+    --line:#262B33;
+    --red-loud:#D9634F;
+    --amber-loud:#E0A93B;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--bone);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--plum); color:var(--ink); }
+  a{ color:var(--sand); text-decoration:none; border-bottom:1px solid rgba(201,180,140,0.35); }
+  a:hover{ border-bottom-color:var(--sand); }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 28px; }
+
+  header.hero{
+    padding:110px 0 90px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--bone-dim);
+    margin:0 0 26px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:450;
+    font-size:clamp(38px, 6vw, 58px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:300;
+    color:var(--bone-dim);
+  }
+  .lede{
+    font-size:18px;
+    color:var(--bone-dim);
+    max-width:52ch;
+    margin:0 0 44px;
+  }
+
+  /* --- live demo --- */
+  .demo{
+    background:var(--ink-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:26px 24px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14.5px;
+  }
+  .demo-line{ display:flex; align-items:center; gap:14px; white-space:nowrap; overflow:hidden; }
+  .demo-bar{ display:inline-flex; letter-spacing:1px; }
+  .demo-bar span{ display:inline-block; width:9px; }
+  .demo-meta{ color:var(--bone-dim); font-variant-numeric:tabular-nums; }
+
+  .install{
+    margin-top:22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--ink);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:13px 16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+  }
+  .install button{
+    background:none;
+    border:none;
+    color:var(--bone-dim);
+    font-family:inherit;
+    font-size:12.5px;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    padding:4px 10px;
+    border:1px solid var(--line);
+    border-radius:4px;
+  }
+  .install button:hover{ color:var(--bone); border-color:var(--bone-dim); }
+
+  section{ padding:78px 0; border-bottom:1px solid var(--line); }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:450;
+    font-size:28px;
+    margin:0 0 14px;
+  }
+  .section-note{ color:var(--bone-dim); max-width:56ch; margin:0 0 40px; }
+
+  /* --- loud vs calm --- */
+  .compare{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:640px){ .compare{ grid-template-columns:1fr; } }
+  .term{
+    border-radius:6px;
+    padding:20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px;
+    border:1px solid var(--line);
+  }
+  .term-label{
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:16px;
+    display:block;
+  }
+  .term.loud{ background:#191316; }
+  .term.loud .term-label{ color:var(--red-loud); }
+  .term.calm{ background:var(--ink-raised); }
+  .term.calm .term-label{ color:var(--sage); }
+  .loud-bar{ color:var(--amber-loud); letter-spacing:0; animation:jitter 0.09s infinite; }
+  .loud-pct{ color:var(--red-loud); font-weight:500; }
+  @keyframes jitter{
+    0%{ transform:translateX(0); }
+    25%{ transform:translateX(0.6px); }
+    50%{ transform:translateX(-0.6px); }
+    75%{ transform:translateX(0.4px); }
+    100%{ transform:translateX(0); }
+  }
+  .term p{ margin:10px 0 0; color:var(--bone-dim); font-family:'IBM Plex Sans', sans-serif; font-size:13px; }
+
+  /* --- code examples --- */
+  .code-block{
+    background:var(--ink-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:20px 22px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px;
+    line-height:1.7;
+    overflow-x:auto;
+    margin-bottom:16px;
+  }
+  .code-block .c1{ color:var(--bone-dim); }
+  .code-block .kw{ color:var(--plum); }
+  .code-block .fn{ color:var(--sand); }
+  .code-block .str{ color:var(--sage); }
+  .mode-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--bone-dim);
+    margin:0 0 8px;
+    letter-spacing:0.04em;
+  }
+
+  /* --- philosophy --- */
+  .notes{ list-style:none; padding:0; margin:0; }
+  .notes li{
+    display:grid;
+    grid-template-columns:22px 1fr;
+    gap:14px;
+    padding:16px 0;
+    border-top:1px solid var(--line);
+  }
+  .notes li:first-child{ border-top:none; }
+  .notes .glyph{ color:var(--sand); font-family:'IBM Plex Mono', monospace; }
+  .notes .body-text b{ color:var(--bone); font-weight:500; }
+  .notes .body-text{ color:var(--bone-dim); }
+
+  footer{ padding:60px 0 90px; }
+  footer .foot-row{
+    display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:14px;
+  }
+  footer .foot-title{ font-family:'Fraunces', serif; font-size:19px; }
+  footer .links{ font-family:'IBM Plex Mono', monospace; font-size:13px; display:flex; gap:22px; }
+  footer .hint{
+    margin-top:46px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:#4A5058;
+  }
+
+  /* --- easter egg reveal --- */
+  #reveal-overlay{
+    position:fixed; inset:0;
+    background:rgba(18,21,26,0.72);
+    backdrop-filter:blur(3px);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity 0.9s ease;
+    z-index:50;
+  }
+  #reveal-overlay.show{ opacity:1; pointer-events:auto; }
+  #reveal-card{
+    background:var(--ink-raised);
+    border:1px solid var(--line);
+    border-radius:10px 10px 0 0;
+    padding:34px 30px 40px;
+    max-width:420px;
+    width:100%;
+    transform:translateY(100%);
+    transition:transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    text-align:center;
+  }
+  #reveal-overlay.show #reveal-card{ transform:translateY(0); }
+  #reveal-card .glyph-big{ font-size:30px; color:var(--sand); margin-bottom:14px; display:block; }
+  #reveal-card h3{ font-family:'Fraunces', serif; font-weight:450; font-size:22px; margin:0 0 6px; }
+  #reveal-card p{ color:var(--bone-dim); margin:0 0 22px; font-size:14px; }
+  #reveal-card .rows{ font-family:'IBM Plex Mono', monospace; font-size:13.5px; text-align:left; display:grid; gap:10px; }
+  #reveal-card .rows div{ display:flex; justify-content:space-between; border-top:1px solid var(--line); padding-top:10px; }
+  #reveal-card .rows div:first-child{ border-top:none; padding-top:0; }
+  #reveal-card .rows span:first-child{ color:var(--bone-dim); }
+  #reveal-close{
+    margin-top:24px; background:none; border:1px solid var(--line); color:var(--bone-dim);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; padding:8px 16px; border-radius:5px; cursor:pointer;
+  }
+  #reveal-close:hover{ color:var(--bone); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">pip install stillpoint</p>
+    <h1>A progress bar<br><em>with nothing to prove.</em></h1>
+    <p class="lede">Every terminal library races to grab your attention. stillpoint doesn't. Soft gradients, eased motion, and typography that doesn't jitter as the numbers grow — for the long-running jobs you actually have to sit with.</p>
+
+    <div class="demo">
+      <div class="demo-line">
+        <span class="demo-bar" id="bar"></span>
+        <span class="demo-meta" id="meta">training&nbsp;&nbsp;&nbsp;0 – 240&nbsp;&nbsp;0%&nbsp;&nbsp;0:00</span>
+      </div>
+    </div>
+
+    <div class="install">
+      <span>$ pip install stillpoint</span>
+      <button id="copy-btn" onclick="navigator.clipboard.writeText('pip install stillpoint'); this.textContent='copied'; setTimeout(()=>this.textContent='copy',1400)">copy</button>
+    </div>
+  </header>
+
+  <section id="compare">
+    <h2>The loud default, and the alternative</h2>
+    <p class="section-note">Most progress bars are designed like alarms. stillpoint is designed like a held breath.</p>
+    <div class="compare">
+      <div class="term loud">
+        <span class="term-label">most libraries</span>
+        <div class="loud-bar">[####################----] <span class="loud-pct">83%</span> ETA: 00:04</div>
+        <p>Hard edges, primary colors, a countdown that begs to be watched.</p>
+      </div>
+      <div class="term calm">
+        <span class="term-label">stillpoint</span>
+        <div class="demo-line">
+          <span class="demo-bar" id="bar2"></span>
+        </div>
+        <p>A gradient with a soft leading edge, paced by an easing curve instead of your CPU.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="usage">
+    <h2>Three ways to sit with a wait</h2>
+    <p class="section-note">Determinate work, indeterminate waits, and a quiet mode for people who'd rather not watch at all.</p>
+
+    <p class="mode-label">// a loop with a known length</p>
+    <div class="code-block"><span class="kw">from</span> stillpoint <span class="kw">import</span> stillpoint
+
+<span class="kw">for</span> item <span class="kw">in</span> <span class="fn">stillpoint</span>(<span class="fn">range</span>(100), label=<span class="str">"training"</span>):
+    train_step(item)</div>
+
+    <p class="mode-label">// a wait with no known total</p>
+    <div class="code-block"><span class="kw">with</span> stillpoint.<span class="fn">breathe</span>(label=<span class="str">"waiting for response"</span>):
+    slow_network_call()</div>
+
+    <p class="mode-label">// for people who find bars distracting</p>
+    <div class="code-block"><span class="kw">for</span> item <span class="kw">in</span> <span class="fn">stillpoint</span>(data, mode=<span class="str">"quiet"</span>):
+    process(item)</div>
+  </section>
+
+  <section id="philosophy">
+    <h2>Design notes</h2>
+    <ul class="notes">
+      <li><span class="glyph">01</span><span class="body-text"><b>Time-driven, not tick-driven.</b> Frames redraw at a capped rate regardless of loop speed, so a tight inner loop never floods your terminal.</span></li>
+      <li><span class="glyph">02</span><span class="body-text"><b>Numbers set with care.</b> Counts are right-aligned to a fixed width so the line doesn't jitter as digits grow.</span></li>
+      <li><span class="glyph">03</span><span class="body-text"><b>No fake progress.</b> Indeterminate waits get a breathing glyph, not a bar creeping toward a number it can't back up.</span></li>
+      <li><span class="glyph">04</span><span class="body-text"><b>Zero dependencies.</b> Built on ANSI escape codes and the standard library — nothing else installs when stillpoint does.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="foot-row">
+      <span class="foot-title">stillpoint</span>
+      <div class="links">
+        <a href="https://pypi.org/project/stillpoint/">PyPI</a>
+        <a href="https://github.com/YOUR_GITHUB_HANDLE/stillpoint">GitHub</a>
+        <a href="https://abhishekshah.vercel.app">abhishekshah.vercel.app</a>
+      </div>
+    </div>
+    <p class="hint">// there's a word on this page that makes it exhale.</p>
+  </footer>
+</div>
+
+<div id="reveal-overlay">
+  <div id="reveal-card">
+    <span class="glyph-big" id="reveal-glyph">◯</span>
+    <h3>Built by hand, on purpose</h3>
+    <p>stillpoint is a small, independent project.</p>
+    <div class="rows">
+      <div><span>Made by</span><span>Abhishek Shah</span></div>
+      <div><span>Email</span><a href="mailto:abhishek.aimarine@gmail.com">abhishek.aimarine@gmail.com</a></div>
+      <div><span>GitHub</span><a href="https://github.com/YOUR_GITHUB_HANDLE">github.com/YOUR_GITHUB_HANDLE</a></div>
+      <div><span>Portfolio</span><a href="https://abhishekshah.vercel.app">abhishekshah.vercel.app</a></div>
+    </div>
+    <button id="reveal-close" onclick="document.getElementById('reveal-overlay').classList.remove('show')">close</button>
+  </div>
+</div>
+
+<script>
+  // ---- easing, matching the Python core's cosine ease-in-out ----
+  function easeInOut(t){ return 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, t))); }
+
+  const GRADIENTS = {
+    dawn: ['#3A4A5C', '#8FA6A0', '#D8C7A1']
+  };
+  function hexToRgb(h){ h = h.replace('#',''); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+  function lerp(a,b,t){ return Math.round(a + (b-a)*t); }
+  function sampleGradient(stops, t){
+    t = Math.max(0, Math.min(1, t));
+    const rgbStops = stops.map(hexToRgb);
+    const n = rgbStops.length - 1;
+    const seg = Math.min(Math.floor(t*n), n-1);
+    const localT = (t*n) - seg;
+    const c0 = rgbStops[seg], c1 = rgbStops[seg+1];
+    return [0,1,2].map(i => lerp(c0[i], c1[i], localT));
+  }
+  const BLOCK = '█', SOFT = ' ▁▂▃▄▅▆▇█';
+  const WIDTH = 26;
+
+  function renderBar(el, fraction){
+    fraction = Math.max(0, Math.min(1, fraction));
+    const filledExact = fraction * WIDTH;
+    const filledFull = Math.floor(filledExact);
+    const remainder = filledExact - filledFull;
+    el.innerHTML = '';
+    for(let i=0;i<WIDTH;i++){
+      const t = (i+0.5)/WIDTH;
+      const [r,g,b] = sampleGradient(GRADIENTS.dawn, t);
+      const span = document.createElement('span');
+      if(i < filledFull){ span.textContent = BLOCK; span.style.color = `rgb(${r},${g},${b})`; }
+      else if(i === filledFull && remainder > 0){
+        const idx = Math.max(1, Math.round(remainder*(SOFT.length-1)));
+        span.textContent = SOFT[idx]; span.style.color = `rgb(${r},${g},${b})`;
+      } else { span.textContent = SOFT[1]; span.style.color = '#3A4148'; }
+      el.appendChild(span);
+    }
+  }
+
+  // hero demo: loops through a determinate run
+  const bar = document.getElementById('bar');
+  const meta = document.getElementById('meta');
+  const bar2 = document.getElementById('bar2');
+  const TOTAL = 240;
+  const DURATION = 6500;
+  let start = performance.now();
+
+  function pad(n, w){ return String(n).padStart(w, ' '); }
+
+  function frame(now){
+    let t = ((now - start) % DURATION) / DURATION;
+    const current = Math.round(t * TOTAL);
+    renderBar(bar, t);
+    renderBar(bar2, t);
+    const pct = Math.round(t*100);
+    const secs = Math.floor(((now-start)%DURATION)/1000);
+    meta.textContent = `training   ${pad(current,3)} – ${TOTAL}   ${pad(pct,3)}%   0:${String(secs).padStart(2,'0')}`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---- easter egg: typing "breathe" anywhere reveals the credits ----
+  let buffer = '';
+  const TRIGGER = 'breathe';
+  window.addEventListener('keydown', (e) => {
+    if(e.key.length !== 1) return;
+    buffer = (buffer + e.key.toLowerCase()).slice(-TRIGGER.length);
+    if(buffer === TRIGGER){
+      document.getElementById('reveal-overlay').classList.add('show');
+    }
+  });
+</script>
+
+</body>
+</html>
