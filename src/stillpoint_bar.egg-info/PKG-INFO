@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: stillpoint-bar
-Version: 0.1.0
+Version: 0.1.2
 Summary: A calm, typographically considered progress indicator for the terminal.
 Author-email: Abhishek Shah <abhishek.aimarine@gmail.com>
 License-Expression: MIT
@@ -36,7 +36,7 @@ printed page.
 ## Install
 
 ```bash
-pip install stillpoint
+pip install stillpoint-bar
 ```
 
 ## Use
