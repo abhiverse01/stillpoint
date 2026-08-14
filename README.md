@@ -16,7 +16,7 @@ printed page.
 ## Install
 
 ```bash
-pip install stillpoint
+pip install stillpoint-bar
 ```
 
 ## Use
