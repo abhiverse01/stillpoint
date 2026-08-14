@@ -1,0 +1,7 @@
+@"
+dist/
+build/
+*.egg-info/
+__pycache__/
+*.pyc
+"@ | Set-Content -Encoding utf8 .gitignore
